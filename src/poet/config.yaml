@@ -1,0 +1,97 @@
+model:
+  name: google/gemma-2-2b
+  use_lora: true
+  d_model: 2304
+  run_eval: false
+  finetune_language_model: true
+
+sae:
+  sae_layer: 12
+  d_sae: 65536 # 16384 # 65536
+  type: "top-k"
+  top_k: 20
+  top_k_curriculum: false
+  disturb: false
+  use_orthogonal: false
+  use_finetuned: true
+  sae_weights: "Wencpinv_benczero_Wdecrndm_bdeczero"
+  any_trainable: true # it is possible not to use_orthogonal, but still have any_trainable
+  train_W_enc: true
+  train_b_enc: true
+  train_b_dec: true
+  binary:
+    use_binary: false
+    temperature: 1
+  finetuning:
+    orthogonality_lambda: 1e-04
+    d_sub_decoder: 1024
+    welch_k: 1
+    active_features_only: false
+
+curriculum:
+  top_k:
+    start: 2048
+    end: 64
+    steps: 300
+    reduction_factor: 1 # divide number of active features every curriculum.top_k.steps by (2 * reduction_factor) # must be power of 2
+
+lora:
+  rank: 128
+  alpha: 256
+  dropout: 0.05
+
+dataset:
+  name: meta-math
+  for_generation: false
+  eval_length: 500
+
+interpretability:
+  num_eval_features: 2000
+  max_words_description: 20
+  num_spans_per_feature: 20
+  window_leading_trailing_tokens: 10
+  feature_index: 27076
+  num_explanations: 1000
+  total_snippets: 5
+  correct_snippets: 1
+  total_evaluations: 500
+  compute_active: false
+  write_gsm8k_heap: false
+  centered_embeddings: false
+
+intervenability:
+  do_intervene: false
+  insertion_value: 200
+
+bootstrap:
+  iterations: 100
+  metric: "interp_score"
+  orthogonalities: ["1e-01", "1e-02", "1e-03", "1e-04", "1e-05", "1e-06", "1e-07", "1e-08", "1e-09", "1e-10", "0e-00"]
+
+plotting:
+  type: "bar"
+  mask_values: [3,5,10]
+  
+training:
+  per_device_train_batch_size: 4
+  # gradient_accumulation_steps: 4
+  include_sae: true
+  num_train_epochs: 1
+  learning_rate: 5e-05
+  warmup_steps: 200
+  lr_scheduler_type: cosine
+  logging_steps: 100
+  save_steps: 1000
+  gradient_checkpointing: true
+  max_grad_norm: 1
+  dataset: null
+
+eval:
+  checkpoint: 23453
+  max_eval_batches: 30
+  write_eval_file: false
+  max_features_stored: 100
+  dataset: null
+
+wandb:
+  name: wikitext-103-orthogonal-topk20 # trainWencbencbdec

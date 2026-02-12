@@ -1,0 +1,26 @@
+# Launching scripts
+mm.sub
+florent.sub
+eval.sub
+multi_finetune.sub
+multi_train.sub
+execute.sh
+eval.sh
+finetune.sh
+mm.sh
+
+# Tokens
+login.txt
+.env
+
+# Plots
+plots/
+
+# DS_Store
+.DS_Store
+**/.DS_Store
+
+# Irrelevant files
+src/poet/active_features.py
+src/poet/bootstrap.py
+src/poet/find_models.py
