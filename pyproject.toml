@@ -1,0 +1,32 @@
+[project]
+name = "poet"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Moritz Miller",email = "moritz.miller@tuebingen.mpg.de"}
+]
+readme = "README.md"
+requires-python = ">=3.12,<3.15"
+dependencies = [
+    "tensorboard (>=2.20.0,<3.0.0)",
+    "torch (>=2.9.1,<3.0.0)",
+    "triton (>=3.5.1,<4.0.0)",
+    "transformers (>=4.57.1,<5.0.0)",
+    "datasets (>=4.4.1,<5.0.0)",
+    "tokenizers (>=0.22.1,<0.23.0)",
+    "accelerate (>=1.11.0,<2.0.0)",
+    "python-dotenv (>=1.2.1,<2.0.0)",
+    "wandb (>=0.23.0,<0.24.0)",
+    "peft (>=0.18.0,<0.19.0)",
+    "matplotlib (>=3.10.8,<4.0.0)",
+    "seaborn (>=0.13.2,<0.14.0)",
+    "clip @ git+https://github.com/openai/CLIP.git",
+    "sentence-transformers (>=5.2.0,<6.0.0)",
+]
+
+[tool.poetry]
+packages = [{include = "poet", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

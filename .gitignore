@@ -1,0 +1,53 @@
+# Launching scripts
+mm.sub
+florent.sub
+eval.sub
+multi_finetune.sub
+multi_train.sub
+execute.sh
+eval.sh
+finetune.sh
+mm.sh
+removal.sh
+aggregate_pipeline.sub
+eval_pipeline.sub
+
+# Tokens
+login.txt
+.env
+
+# Plots and statistics
+plots/
+statistics/
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# DS_Store
+.DS_Store
+**/.DS_Store
+
+# Irrelevant files
+src/poet/find_models.py
+src/poet/insertion_sweep.py
+src/poet/latex.py
+src/poet/load_sae.py
+src/poet/potential_datasets.py
+src/poet/preflight_stage2.py
+src/poet/verify_marking.py
+eval_pipeline.sh
+aggregate_pipeline.sh
+
+
+
+# SAE checkpoints
+orthogonal-weights/
+
+# Hugging face
+src/poet/hub.py
+src/poet/load_hub.py
+
+# Claude
+src/.claude/
+.claude/

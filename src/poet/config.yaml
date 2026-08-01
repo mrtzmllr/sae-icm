@@ -1,0 +1,117 @@
+# Three runnable setups (swap via CLI overrides, see comments per field):
+# Gemma-2-2B :    google/gemma-2-2b         d_model 2304 (SAEBench)
+# Llama-3.2-1B:   meta-llama/Llama-3.2-1B   d_model 2048 (seonglae)
+
+model:
+  name: google/gemma-2-2b # google/gemma-2-2b | meta-llama/Llama-3.2-1B
+  use_lora: true
+  d_model: 2304           # gemma-2-2b: 2304 | llama-3.2-1b: 2048
+  run_eval: false
+  finetune_language_model: true
+  retrieve_from_hub: false
+
+sae:
+  sae_layer: 12           # gemma resid_post L12 | seonglae blocks.12.hook_resid_pre
+  insertion_layer: null   # experimental: splice the (sae_layer-trained) SAE at a different layer; null = use sae_layer. Not used in COLM project.
+  d_sae: 65536            # gemma: 65536 / 16384 | seonglae: 14336
+  type: "top-k"
+  top_k: 20
+  
+  # Pretrained residual-stream SAE source (used by from_huggingface for Llama only; ignored for Gemma).
+  pretrained_format: "saelens"
+  pretrained_repo: "seonglae/Llama-3.2-1B-sae"
+  pretrained_subfolder: "Llama-3.2-1B_blocks.12.hook_resid_pre_14336_topk_48_0.0002_42_fineweb_512"
+
+  top_k_curriculum: false
+  disturb: false
+  use_orthogonal: false
+  use_finetuned: true
+  sae_weights: "Wencpinv_benczero_Wdecrndm_bdeczero"
+  any_trainable: true # it is possible not to use_orthogonal, but still have any_trainable
+  train_W_enc: true
+  train_b_enc: true
+  train_b_dec: true
+  binary:
+    use_binary: false
+    temperature: 1
+  finetuning:
+    orthogonality_lambda: 1e-04
+    d_sub_decoder: 1024
+    welch_k: 1
+    active_features_only: false
+
+# curriculum not used in COLM version of project
+curriculum:
+  top_k:
+    start: 2048
+    end: 64
+    steps: 300
+    reduction_factor: 1 # divide number of active features every curriculum.top_k.steps by (2 * reduction_factor) # must be power of 2
+
+lora:
+  rank: 128
+  alpha: 256
+  dropout: 0.05
+
+dataset:
+  name: meta-math
+  for_generation: false
+  eval_length: 500
+
+interpretability:
+  num_eval_features: 2000   # number of features to interpret in total in prompt_template.py
+  max_words_description: 20
+  num_spans_per_feature: 20
+  window_leading_trailing_tokens: 10
+  feature_index: 27076
+  num_explanations: 1000    # number of explanations to write for embedding metrics in embeddings.py
+  total_snippets: 5
+  correct_snippets: 1
+  total_evaluations: 300    # number of evaluations of the interpretability score in interpretability_score.py (and bootstrap.py)
+  compute_active: false
+  write_gsm8k_heap: false
+  centered_embeddings: false
+  mathematical_system_prompt: true
+
+intervenability:
+  do_intervene: false
+  insertion_value: 200      # gemma-2-2b: 200 | llama-3.2-1b: 20
+  group: "names"
+  replacement_group: "names"
+  sweep_values: [10, 20, 50, 100, 150, 200, 300, 500]
+  run_sweep: false
+
+bootstrap:
+  iterations: 100
+  metric: "interp_score"
+  orthogonalities: ["1e-04", "1e-05", "1e-06", "0e-00"]
+
+plotting:
+  type: "bar"
+  mask_values: [0,1,2,3]
+  mask: false
+  
+training:
+  run_tag: resid-post     # isolate new runs under a specific named directory
+  per_device_train_batch_size: 4
+  # gradient_accumulation_steps: 4
+  include_sae: true
+  num_train_epochs: 1
+  learning_rate: 5e-05
+  warmup_steps: 200
+  lr_scheduler_type: cosine
+  logging_steps: 100
+  save_steps: 1000
+  gradient_checkpointing: true
+  max_grad_norm: 1
+  dataset: null
+
+eval:
+  checkpoint: 23453
+  max_eval_batches: 30
+  write_eval_file: false
+  max_features_stored: 100
+  dataset: null
+
+wandb:
+  name: wikitext-103-orthogonal-topk20
