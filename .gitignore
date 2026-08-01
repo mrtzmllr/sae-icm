@@ -46,7 +46,6 @@ orthogonal-weights/
 
 # Hugging face
 src/poet/hub.py
-src/poet/load_hub.py
 
 # Claude
 src/.claude/

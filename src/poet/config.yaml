@@ -63,7 +63,7 @@ interpretability:
   max_words_description: 20
   num_spans_per_feature: 20
   window_leading_trailing_tokens: 10
-  feature_index: 27076
+  feature_index: 27076      # this is the aqua feature in gemma-2-2b
   num_explanations: 1000    # number of explanations to write for embedding metrics in embeddings.py
   total_snippets: 5
   correct_snippets: 1
