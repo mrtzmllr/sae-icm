@@ -29,7 +29,7 @@ markers = {"Low": "o",
 
 project_path = os.getenv('PROJECT_PATH')
 # output path depending on run_tag in src/poet/config.yaml
-out = os.path.join(project_path, "resid-post/toy/plots")
+out = os.path.join(project_path, "toy/plots")
 os.makedirs(out, exist_ok=True)
 
 ########## Sparse latent samples ##########

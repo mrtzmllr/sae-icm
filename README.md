@@ -1,6 +1,6 @@
 This repository contains the code for our paper:
 
-**Identifying Intervenable and Interpretable Features via Orthogonality Regularization** <br>
+**Towards Isolated Interventions via Almost Orthogonal Features in Language Models** <br>
 *Moritz Miller\*, Florent Draye\*, Bernhard Schölkopf*[^1] <br>
 
 [^1]: M.M. and F.D. contributed equally to this work. Author order was determined by a 60–40 coin flip.
@@ -53,10 +53,12 @@ You can start by cloning our repository and following the steps below.
 That's it! You can now explore our modelling pipeline or fine-tune your own language models. The key entry points are as follows (starting from `src/poet`):
 - `train.py` is configured from the configuration yaml `config.yaml` and trains the corresponding language model. You can try `poetry run torchrun --nproc_per_node=$NUM_GPUS -m src.poet.train` to fine-tune a language model around a fixed sparse autoencoder (SAE).
 - `finetune_sae.py` is configured from the configuration yaml `config.yaml` and fine-tunes the SAE on reconstruction loss. You can try `poetry run torchrun --nproc_per_node=$NUM_GPUS -m src.poet.finetune_sae` to fine-tune the SAE.
-- `eval.py` writes the evaluation files for a series of models. You can supply a set of arguments and evaluate on that model if it exists. You can then evalute your trained model.
-- `shell.sh` is a ready-to-use shell script that directly assists in fine-tuning langauge model, SAE, and evaluation.
+- `eval.py` writes the evaluation files for a series of models. You can supply a set of arguments and evaluate on that model if it exists. You can then evaluate your trained model.
+- `shell.sh` (at the repository root) is a ready-to-use shell script that directly assists in fine-tuning language model, SAE, and evaluation.
 - `sae.py` creates the SAE class and is used for loading.
-- `insert_sae.py` handles insertion of the SAE into the language model.
+- `insert_sae.py` handles insertion of the SAE into the language model (`insert_sae_llama.py` is the Llama counterpart).
+
+Note that CLI overrides must use fully dotted keys (e.g. `--eval.write_eval_file true`, not `--write_eval_file true`); unknown keys are set silently and never read. Orthogonality penalties are passed as literal strings such as `1e-04`, which are embedded verbatim in artifact paths.
 
 
 ## Additional files
@@ -65,11 +67,14 @@ In addition, we provide a suite of files relevant for setting up the workstream 
 - `callbacks.py` modifies the :hugs: Trainer.
 - `directories.py` writes the relevant directories for storing weights.
 - `embeddings.py`, `explanation_similarity.py`, `heap.py`, `interpret_features.py`, `interpretability_score.py`, `prompt_template.py` are required to run interpretability analyses.
-- `dataset.py` handels the datasets.
-- `generate.py` handles model generation.
+- `dataset.py` handles the datasets.
+- `generate.py` handles model generation. `generate_activations.py` collects residual-stream activations.
 - `lora.py` inserts the LoRA module. 
+- `load_finetuned.py` loads fine-tuned checkpoints for evaluation.
+- `bootstrap.py` computes the basic bootstrap confidence intervals for all metrics.
 - `plotting.py` plots the results.
-- `intervene_dataset.py`, `intervene.py` are relevant for interventions.
+- `intervene_dataset.py`, `intervene.py`, `non_intervene.py`, `intervene_adhoc.py` are relevant for interventions.
+- `stability.py` computes the interference measures (ROUGE-L recall and Jensen-Shannon divergence) between standard and intervened generations.
 - `compare_answers.py`, `math_eval.py` are relevant for evaluation on a mathematical dataset.
 - `math_utils.py` defines mathematical utils.
 - `orthogonality.py` runs the orthogonality analysis. Note that the relevant code for fine-tuning is defined in `insert_sae.py`, though.
@@ -77,6 +82,9 @@ In addition, we provide a suite of files relevant for setting up the workstream 
 - `random_weights.py` creates random weights. We do not use this option in our setting.
 - `spans.py` retrieves the relevant spans for a given feature index.
 - `utils.py` checks if the hardware requirements are satisfied.
+
+## Toy experiment
+`src/toy/train.py` reproduces the numerical example from the paper (intervention mismatch and Gram matrices). Run it with `poetry run python -m src.toy.train`; it requires `PROJECT_PATH` from your `.env` and saves the two figures under `$PROJECT_PATH/toy/plots`.
 
 # Maintainers
 * [Moritz Miller](https://moritzmiller.de)
